@@ -1,0 +1,54 @@
+before_script:
+  - pwd
+  - pm2 del all 
+
+stages:
+  - deploy
+
+build stage:
+  stage: deploy
+  script:
+    # - git checkout -f origin/master
+    - cp -raf $(pwd)/. /opt/afsaran-admin-frontend-project/
+    - cd /opt/afsaran-admin-frontend-project
+    - cp ../ecosystem.config.js ./
+    - cp ../nuxt.config.js ./
+    - npm i
+    - cp -r ../dist node_modules/vue-flickity/
+    - npm run build
+  when: manual
+  # only:
+  #   - dev
+  tags:
+    - app
+    - admin
+    - stage
+    - vm
+  environment:
+    name: production
+
+build prod:
+  stage: deploy
+  script:
+    # - git checkout -f origin/master
+    - cp -raf $(pwd)/. /opt/afsaran-admin-frontend-project/
+    - cd /opt/afsaran-admin-frontend-project
+    - cp ../ecosystem.config.js ./
+    - cp ../nuxt.config.js ./
+    - npm i
+    - cp -r ../dist node_modules/vue-flickity/
+    - npm run build
+  when: manual
+  only:
+    - master
+  tags:
+    - app
+    - admin
+    - prod
+    - vm
+  environment:
+    name: production
+
+after_script:
+  - cd /opt/afsaran-admin-frontend-project
+  - pm2 start -i max
